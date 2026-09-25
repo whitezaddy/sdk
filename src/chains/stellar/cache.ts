@@ -11,7 +11,6 @@ export class CacheQuotaError extends Error {
   }
 }
 
-
 /** Maximum byte budget for IndexedDBCache before LRU eviction. */
 const MAX_BYTES = 50 * 1024 * 1024; // 50 MB
 

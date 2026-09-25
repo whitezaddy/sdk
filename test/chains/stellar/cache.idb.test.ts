@@ -137,7 +137,7 @@ describe('IndexedDBCache', () => {
         });
         tx.objectStore('meta').put({
           key: 'lastSeen:testnet',
-          value: { ledger: 100, cursor: 'c1' }
+          value: { ledger: 100, cursor: 'c1' },
         });
         tx.oncomplete = () => {
           db.close();
@@ -182,13 +182,13 @@ describe('IndexedDBCache', () => {
 
     const origPut = storeProto.put;
     let thrown = false;
-    storeProto.put = function(this: any, value: any, key: any) {
-       if (!thrown && value && (value as any).stealthAddress === 'G3') {
-           thrown = true;
-           const err = new DOMException('QuotaExceededError', 'QuotaExceededError');
-           throw err;
-       }
-       return origPut.call(this, value, key);
+    storeProto.put = function (this: any, value: any, key: any) {
+      if (!thrown && value && (value as any).stealthAddress === 'G3') {
+        thrown = true;
+        const err = new DOMException('QuotaExceededError', 'QuotaExceededError');
+        throw err;
+      }
+      return origPut.call(this, value, key);
     };
 
     try {
@@ -201,7 +201,7 @@ describe('IndexedDBCache', () => {
 
     // Verify it succeeded in saving G3
     const result = await cache.get('testnet', 100, 300);
-    expect(result?.find(a => a.stealthAddress === 'G3')).toBeDefined();
+    expect(result?.find((a) => a.stealthAddress === 'G3')).toBeDefined();
     // lastSeen should be preserved
     expect(await cache.getLastSeen('testnet')).toEqual({ ledger: 200, cursor: 'cursor-2' });
   });
@@ -221,8 +221,8 @@ describe('IndexedDBCache', () => {
     });
 
     const origPut = storeProto.put;
-    storeProto.put = function(this: any, value: any, key: any) {
-       throw new DOMException('QuotaExceededError', 'QuotaExceededError');
+    storeProto.put = function (this: any, value: any, key: any) {
+      throw new DOMException('QuotaExceededError', 'QuotaExceededError');
     };
 
     await expect(cache.put('testnet', [makeAnn('G4', 400)])).rejects.toThrow(CacheQuotaError);
