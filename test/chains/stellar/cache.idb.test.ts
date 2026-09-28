@@ -149,7 +149,7 @@ describe('IndexedDBCache', () => {
     });
 
     // Phase 2 — Force IndexedDBCache to open at version 2 (triggering an upgrade)
-    // We intercept `indexedDB.open` so `IndexedDBCache` triggers its `onupgradeneeded` 
+    // We intercept `indexedDB.open` so `IndexedDBCache` triggers its `onupgradeneeded`
     // block with `oldVersion = 1` and `newVersion = 2`.
     const origOpen = idb.open.bind(idb);
     idb.open = (name: string, version?: number) => {
