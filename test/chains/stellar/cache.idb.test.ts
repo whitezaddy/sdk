@@ -148,15 +148,28 @@ describe('IndexedDBCache', () => {
       req.onerror = () => reject(req.error);
     });
 
-    // Phase 2 — Use IndexedDBCache to open the DB
-    // Since IndexedDBCache now uses conditional creation, it should NOT drop data.
-    const cache = new IndexedDBCache();
-    const result = await cache.get('testnet', 100, 100);
-    expect(result).toHaveLength(1);
-    expect(result![0].stealthAddress).toBe('GFOO');
+    // Phase 2 — Force IndexedDBCache to open at version 2 (triggering an upgrade)
+    // We intercept `indexedDB.open` so `IndexedDBCache` triggers its `onupgradeneeded` 
+    // block with `oldVersion = 1` and `newVersion = 2`.
+    const origOpen = idb.open.bind(idb);
+    idb.open = (name: string, version?: number) => {
+      if (name === DB_NAME && version === 1) {
+        return origOpen(name, 2); // simulate CACHE_VERSION = 2
+      }
+      return origOpen(name, version);
+    };
 
-    const lastSeen = await cache.getLastSeen('testnet');
-    expect(lastSeen).toEqual({ ledger: 100, cursor: 'c1' });
+    try {
+      const cache = new IndexedDBCache();
+      const result = await cache.get('testnet', 100, 100);
+      expect(result).toHaveLength(1);
+      expect(result![0].stealthAddress).toBe('GFOO');
+
+      const lastSeen = await cache.getLastSeen('testnet');
+      expect(lastSeen).toEqual({ ledger: 100, cursor: 'c1' });
+    } finally {
+      idb.open = origOpen;
+    }
   });
 
   // -------------------------------------------------------------------------
