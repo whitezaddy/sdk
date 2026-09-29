@@ -70,7 +70,7 @@ export type { FetchAnnouncementsOptions } from './announcements';
 /**
  * @internal
  */
-export { MemoryCache, IndexedDBCache, autoSelectCache } from './cache';
+export { MemoryCache, IndexedDBCache, autoSelectCache, CacheQuotaError } from './cache';
 export type { AnnouncementCache } from './cache';
 
 /**
