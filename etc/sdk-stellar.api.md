@@ -257,6 +257,11 @@ export interface BuildWithdrawCustomAssetOptions {
 export function bytesToHex(bytes: Uint8Array): string;
 
 // @public
+export class CacheQuotaError extends Error {
+    constructor(message?: string);
+}
+
+// @public
 export function checkStealthAddress(ephemeralPubKey: Uint8Array, viewingKey: Uint8Array, spendingPubKey: Uint8Array, viewTag: number): {
     isMatch: boolean;
     stealthAddress: string | null;
